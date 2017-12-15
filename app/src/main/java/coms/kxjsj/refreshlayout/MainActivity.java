@@ -10,6 +10,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        RefreshLayout.init(new RefreshLayout.DefaultBuilder().setBaseRefreshWrap(MyRefreshWrap.class));
         setContentView(R.layout.activity_main);
 
         final RefreshLayout layout=findViewById(R.id.Refresh);

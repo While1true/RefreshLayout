@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,10 +13,14 @@ import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import static java.lang.Math.signum;
 
@@ -30,11 +35,11 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
     View mHeader, mFooter, mScroll;
 
-    Orentation orentation = Orentation.HORIZONTAL;
+    Orentation orentation = Orentation.VERTICAL;
 
     int scrolls = 0;
 
-    int mMaxScroll = 120, mRefreshPosition = 60, mFlingmax;
+    int mMaxHeaderScroll, mMaxFooterScroll, mHeaderRefreshPosition, mFooterRefreshPosition, mFlingmax;
 
     State state = State.IDEL;
     private ValueAnimator valueAnimator;
@@ -60,7 +65,14 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         super(context, attrs, defStyleAttr);
         attrsUtils = new AttrsUtils();
         attrsUtils.ParseAttrs(context, attrs);
-
+        orentation = attrsUtils.orentation;
+        try {
+            baseRefreshWrap = (BaseRefreshWrap) AttrsUtils.builder.defaultRefreshWrap.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
         initView(context);
     }
 
@@ -101,19 +113,61 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         FrameLayout.LayoutParams layoutParams = (LayoutParams) mScroll.getLayoutParams();
         mScroll.layout(left, top, right, bottom);
         if (orentation == Orentation.VERTICAL) {
-            if (mHeader != null) {
-                mHeader.layout(left, top - mHeader.getMeasuredHeight() - layoutParams.topMargin, right, top - layoutParams.topMargin);
+            if (attrsUtils.isOVERSCROLL()) {
+                mMaxHeaderScroll = getMeasuredHeight() / 2;
+                mMaxFooterScroll = mMaxHeaderScroll;
+            } else {
+                if (mHeader != null) {
+                    if (attrsUtils.mFlingmax == -1) {
+                        mFlingmax = mHeader.getMeasuredHeight() / 6;
+                    }
+                    if (attrsUtils.mMaxHeadertScroll == -1) {
+                        mMaxHeaderScroll = 3 * mHeader.getMeasuredHeight();
+                    }
+                    if (attrsUtils.mHeaderRefreshPosition == -1) {
+                        mHeaderRefreshPosition = mHeader.getMeasuredHeight();
+                    }
+                    mHeader.layout(left, top - mHeader.getMeasuredHeight() - layoutParams.topMargin, right, top - layoutParams.topMargin);
+                }
+                if (mFooter != null) {
+                    if (attrsUtils.mMaxFooterScroll == -1) {
+                        mMaxFooterScroll = (int) (mFooter.getMeasuredHeight() * 1.5f);
+                    }
+                    if (attrsUtils.mFooterRefreshPosition == -1) {
+                        mFooterRefreshPosition = mFooter.getMeasuredHeight();
+                    }
+                    mFooter.layout(left, bottom + layoutParams.bottomMargin, right, bottom + mFooter.getMeasuredHeight() + layoutParams.bottomMargin);
+                }
             }
-            if (mFooter != null) {
-                mFooter.layout(left, bottom + layoutParams.bottomMargin, right, bottom + mFooter.getMeasuredHeight() + layoutParams.bottomMargin);
-            }
+
         } else {
-            if (mHeader != null) {
-                mHeader.layout(left - mHeader.getMeasuredWidth() - layoutParams.leftMargin, top, left - layoutParams.leftMargin, bottom);
+            if (attrsUtils.isOVERSCROLL()) {
+                mMaxHeaderScroll = getMeasuredWidth() / 2;
+                mMaxFooterScroll = mMaxHeaderScroll;
+            } else {
+                if (mHeader != null) {
+                    if (attrsUtils.mFlingmax == -1) {
+                        mFlingmax = mHeader.getMeasuredWidth() / 6;
+                    }
+                    if (attrsUtils.mMaxHeadertScroll == -1) {
+                        mMaxHeaderScroll = 3 * mHeader.getMeasuredWidth();
+                    }
+                    if (attrsUtils.mHeaderRefreshPosition == -1) {
+                        mHeaderRefreshPosition = mHeader.getMeasuredWidth();
+                    }
+                    mHeader.layout(left - mHeader.getMeasuredWidth() - layoutParams.leftMargin, top, left - layoutParams.leftMargin, bottom);
+                }
+                if (mFooter != null) {
+                    if (attrsUtils.mMaxFooterScroll == -1) {
+                        mMaxFooterScroll = (int) (mFooter.getMeasuredWidth() * 1.5f);
+                    }
+                    if (attrsUtils.mFooterRefreshPosition == -1) {
+                        mFooterRefreshPosition = mFooter.getMeasuredWidth();
+                    }
+                    mFooter.layout(right + layoutParams.rightMargin, top, right + mFooter.getMeasuredWidth() + layoutParams.rightMargin, bottom);
+                }
             }
-            if (mFooter != null) {
-                mFooter.layout(right + layoutParams.rightMargin, top, right + mFooter.getMeasuredWidth() + layoutParams.rightMargin, bottom);
-            }
+
         }
 
 
@@ -124,7 +178,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             return;
         }
         valueAnimator.setIntValues(from, to);
-        valueAnimator.setDuration(250 + 150 * Math.abs(from - to) / mMaxScroll);
+        valueAnimator.setDuration(250 + 150 * Math.abs(from - to) / mMaxHeaderScroll);
         valueAnimator.start();
     }
 
@@ -135,7 +189,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     public void setRefreshing() {
         if (state != State.REFRESHING || state != State.LOADING) {
             state = State.REFRESHING;
-            aninatorTo(scrolls, -mRefreshPosition);
+            aninatorTo(scrolls, -mHeaderRefreshPosition);
         }
 
     }
@@ -151,7 +205,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
         if (animatedFraction == 1) {
             if (animatedValue != 0) {
-                if (signum(animatedValue) > 0) {
+                if (animatedValue > 0) {
                     state = State.LOADING;
                 } else {
                     state = State.REFRESHING;
@@ -167,12 +221,18 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         if (callback != null) {
             callback.call(state, value);
         }
+        if (state == State.PULL_HEADER) {
+            baseRefreshWrap.onPullHeader(mHeader, value);
+        } else {
+            baseRefreshWrap.onPullFooter(mFooter, value);
+        }
     }
 
     private void callbackState(State state) {
         if (callback != null) {
             callback.call(state);
         }
+        baseRefreshWrap.OnStateChange(state);
     }
 
     @Override
@@ -181,6 +241,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
         if (scrolls != 0 && (state != State.REFRESHING && state != State.LOADING)) {
             changeState(scrolls);
+            int mRefreshPosition = scrolls > 0 ? mFooterRefreshPosition : mHeaderRefreshPosition;
             if (Math.abs(scrolls) >= mRefreshPosition && !attrsUtils.isOVERSCROLL()) {
                 aninatorTo(scrolls, (int) signum(scrolls) * mRefreshPosition);
             } else {
@@ -197,16 +258,17 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         this.state = statex;
     }
 
-    private void checkBounds() {
+    private void checkBounds(int scrolltemp) {
         int maxheader = 0;
         int maxfooter = 0;
         if (attrsUtils.isOVERSCROLL()) {
-            maxheader = mMaxScroll;
-            maxfooter = mMaxScroll;
+            maxheader = scrolltemp <= 0 ? mMaxHeaderScroll : 0;
+            maxfooter = scrolltemp >= 0 ? mMaxHeaderScroll : 0;
         } else {
-            maxheader = attrsUtils.isCANHEADER() ? mMaxScroll : 0;
-            maxfooter = attrsUtils.isCANFOOTR() ? mMaxScroll : 0;
+            maxheader = attrsUtils.isCANHEADER() && scrolltemp <= 0 ? mMaxHeaderScroll : 0;
+            maxfooter = attrsUtils.isCANFOOTR() && scrolltemp >= 0 ? mMaxFooterScroll : 0;
         }
+
         if (scrolls < -maxheader) {
             scrolls = -maxheader;
         }
@@ -218,7 +280,6 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onNestedScroll(@NonNull View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-        System.out.println(dxConsumed);
         if (state == State.REFRESHING || state == State.LOADING) {
             return;
         } else if (valueAnimator.isRunning()) {
@@ -233,7 +294,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             int tempscrolls = scrolls;
             scrolls += dscroll;
             System.out.println("onNestedScroll" + scrolls);
-            checkBounds();
+            checkBounds(tempscrolls);
             doScroll(isvertical);
             changeState(tempscrolls);
             callbackScroll(state, scrolls);
@@ -251,7 +312,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             System.out.println("onNestedPreScroll" + scrolls);
             int scrolltemp = scrolls;
             scrolls += dscroll;
-//            checkBounds();
+            checkBounds(scrolltemp);
             if (isvertical) {
                 consumed[1] = scrolls - scrolltemp;
             } else {
@@ -322,6 +383,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
     /**
      * 初始化全局配置
+     *
      * @param defaultBuilder
      */
     public static void init(DefaultBuilder defaultBuilder) {
@@ -334,6 +396,9 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     public static class AttrsUtils {
         private int HEADER_LAYOUTID, SCROLL_LAYOUT_ID, FOOTER_LAYOUTID;
         private boolean CANHEADER = false, CANFOOTR = false, OVERSCROLL = false;
+
+        private Orentation orentation = Orentation.VERTICAL;
+        private int mMaxHeadertScroll = -1, mMaxFooterScroll = -1, mHeaderRefreshPosition = -1, mFooterRefreshPosition = -1, mFlingmax = -1;
         private static DefaultBuilder builder = new DefaultBuilder();
 
         private static void setBuilder(DefaultBuilder builderx) {
@@ -354,6 +419,17 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             CANFOOTR = typedArray.getBoolean(R.styleable.RefreshLayout_canFooter, builder.CANFOOTR_DEFAULT);
 
             OVERSCROLL = typedArray.getBoolean(R.styleable.RefreshLayout_overscroll, builder.OVERSCROLL_DEFAULT);
+
+            int orentation = typedArray.getInt(R.styleable.RefreshLayout_orentation, 1);
+            if (orentation == 0) {
+                this.orentation = Orentation.HORIZONTAL;
+            }
+            mMaxHeadertScroll = (int) typedArray.getDimension(R.styleable.RefreshLayout_mMaxHeadertScroll, mMaxHeadertScroll);
+            mMaxFooterScroll = (int) typedArray.getDimension(R.styleable.RefreshLayout_mMaxFooterScroll, mMaxFooterScroll);
+            mHeaderRefreshPosition = (int) typedArray.getDimension(R.styleable.RefreshLayout_mHeaderRefreshPosition, mHeaderRefreshPosition);
+            mFooterRefreshPosition = (int) typedArray.getDimension(R.styleable.RefreshLayout_mFooterRefreshPosition, mFooterRefreshPosition);
+            mFlingmax = (int) typedArray.getDimension(R.styleable.RefreshLayout_mFlingmax, mFlingmax);
+
 
             typedArray.recycle();
         }
@@ -388,8 +464,14 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
      * 保存全局默认配置
      */
     public static class DefaultBuilder {
-        private  int HEADER_LAYOUTID_DEFAULT, SCROLL_LAYOUT_ID_DEFAULT, FOOTER_LAYOUTID_DEFAULT;
-        private  boolean CANHEADER_DEFAULT = true, CANFOOTR_DEFAULT = false, OVERSCROLL_DEFAULT = false;
+        private int HEADER_LAYOUTID_DEFAULT, SCROLL_LAYOUT_ID_DEFAULT, FOOTER_LAYOUTID_DEFAULT;
+        private boolean CANHEADER_DEFAULT = true, CANFOOTR_DEFAULT = false, OVERSCROLL_DEFAULT = false;
+        private Class defaultRefreshWrap = BaseRefreshWrap.class;
+
+        public DefaultBuilder setBaseRefreshWrap(Class defaultRefreshWrap) {
+            this.defaultRefreshWrap = defaultRefreshWrap;
+            return this;
+        }
 
         public DefaultBuilder setHeaderLayoutidDefault(int headerLayoutidDefault) {
             HEADER_LAYOUTID_DEFAULT = headerLayoutidDefault;
@@ -423,4 +505,71 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     }
 
 
+    private BaseRefreshWrap baseRefreshWrap;
+
+    public void SetRefreshWrap(BaseRefreshWrap baseRefreshWrap) {
+        this.baseRefreshWrap = baseRefreshWrap;
+    }
+
+    public static abstract class BaseRefreshWrap {
+        public abstract void onPullHeader(View view, int scrolls);
+
+        public abstract void onPullFooter(View view, int scroll);
+
+        public abstract void OnStateChange(State state);
+
+        protected  <T extends View> T findViewbyId(View view, int id) {
+            return (T) view.findViewById(id);
+        }
+
+    }
+
+
+    public Orentation getOrentation() {
+        return orentation;
+    }
+
+    public void setOrentation(Orentation orentation) {
+        this.orentation = orentation;
+    }
+
+    public int getmMaxHeadertScroll() {
+        return mMaxHeaderScroll;
+    }
+
+    public void setmMaxHeadertScroll(int mMaxHeadertScroll) {
+        this.mMaxHeaderScroll = mMaxHeadertScroll;
+    }
+
+    public int getmMaxFooterScroll() {
+        return mMaxFooterScroll;
+    }
+
+    public void setmMaxFooterScroll(int mMaxFooterScroll) {
+        this.mMaxFooterScroll = mMaxFooterScroll;
+    }
+
+    public int getmHeaderRefreshPosition() {
+        return mHeaderRefreshPosition;
+    }
+
+    public void setmHeaderRefreshPosition(int mHeaderRefreshPosition) {
+        this.mHeaderRefreshPosition = mHeaderRefreshPosition;
+    }
+
+    public int getmFooterRefreshPosition() {
+        return mFooterRefreshPosition;
+    }
+
+    public void setmFooterRefreshPosition(int mFooterRefreshPosition) {
+        this.mFooterRefreshPosition = mFooterRefreshPosition;
+    }
+
+    public int getmFlingmax() {
+        return mFlingmax;
+    }
+
+    public void setmFlingmax(int mFlingmax) {
+        this.mFlingmax = mFlingmax;
+    }
 }
