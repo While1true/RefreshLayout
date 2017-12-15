@@ -3,7 +3,6 @@ package coms.kxjsj.refreshlayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import coms.kxjsj.refreshlayout_master.Callback1;
 import coms.kxjsj.refreshlayout_master.RefreshLayout;
 
 public class MainActivity extends AppCompatActivity {
@@ -14,7 +13,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final RefreshLayout layout=findViewById(R.id.Refresh);
-        layout.setListener(new Callback1<RefreshLayout.State>() {
+        layout.setListener(new RefreshLayout.Callback1<RefreshLayout.State>() {
             @Override
             public void call(RefreshLayout.State state) {
                 super.call(state);
