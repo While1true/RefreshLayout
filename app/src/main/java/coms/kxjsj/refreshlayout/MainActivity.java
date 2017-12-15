@@ -27,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
                     },3000);
                 }
             }
-
             @Override
             public void call(RefreshLayout.State state, int scroll) {
                 super.call(state, scroll);
