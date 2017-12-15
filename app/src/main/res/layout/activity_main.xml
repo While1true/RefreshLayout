@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+   >
+
+    <coms.kxjsj.refreshlayout_master.RefreshLayout
+        android:id="@+id/Refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:canFooter="false"
+        app:overscroll="true"
+        app:footerID="@layout/hh"
+        app:headerID="@layout/hh"
+        app:scrollID="@layout/xx" />
+
+</FrameLayout>

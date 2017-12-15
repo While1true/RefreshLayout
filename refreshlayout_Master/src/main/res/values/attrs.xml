@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RefreshLayout">
+        <attr name="canHeader" format="boolean" />
+        <attr name="canFooter" format="boolean" />
+        <attr name="overscroll" format="boolean" />
+        <attr name="headerID" format="reference" />
+        <attr name="scrollID" format="reference" />
+        <attr name="footerID" format="reference" />
+    </declare-styleable>
+</resources>
