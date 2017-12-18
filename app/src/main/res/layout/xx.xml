@@ -1,17 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/recyclerview"
+    android:nestedScrollingEnabled="true"
     android:layout_width="match_parent"
-    android:layout_marginTop="8dp"
     android:layout_height="match_parent">
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-    <TextView
-        android:text="这两天有个需求，点击按钮从SD卡解压压缩包，并读取压缩包内txt文档内容，然后在街面上显示出来。毕竟IO操作很耗时，如果文件较大会花费不少时间。所以，在处理数据的时候能给个进度就好了。我们通常的做法就是，点击按钮后弹出一个加载框或者加载进度条，等数据处理结束后，再让对话框消失。
 
-但是现在的需求是，用一个布局，左侧显示刷新列表，右侧显示ProgressBar。那么问题来了，ProgressBar显示的很大，而且打开后就一直在转动，无法控制。那么就来解决这两个问题吧~"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
-</LinearLayout>
-</android.support.v4.widget.NestedScrollView>
+</android.support.v7.widget.RecyclerView>

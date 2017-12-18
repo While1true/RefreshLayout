@@ -11,8 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:canFooter="true"
-        app:footerID="@layout/footer_layout"
-        app:headerID="@layout/header_layout"
+        app:footerID="@layout/footer_layout_horizontal"
+        app:headerID="@layout/header_layout_horizontal"
         app:scrollID="@layout/xx" />
 
 </FrameLayout>

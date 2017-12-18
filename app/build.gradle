@@ -25,4 +25,5 @@ dependencies {
     //    group: 'com.android.support',
     //    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation project(':refreshlayout_Master')
+    implementation 'com.android.support:recyclerview-v7:26.1.0'
 }

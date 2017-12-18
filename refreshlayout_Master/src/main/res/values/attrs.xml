@@ -16,6 +16,9 @@
         <attr name="mMaxFooterScroll" format="dimension" />
         <attr name="mHeaderRefreshPosition" format="dimension" />
         <attr name="mFooterRefreshPosition" format="dimension" />
+        <attr name="mHeaderRefreshCompletePosition" format="dimension" />
+        <attr name="mFooterLoadingCompletePosition" format="dimension" />
         <attr name="mFlingmax" format="dimension" />
+        <attr name="delayCompleteTime" format="integer" />
     </declare-styleable>
 </resources>
