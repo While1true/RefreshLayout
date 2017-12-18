@@ -257,6 +257,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         mHeader.postDelayed(new Runnable() {
             @Override
             public void run() {
+                state=scrolls<=0?State.PULL_HEADER:State.PULL_FOOTER;
                 aninatorTo(scrolls, 0);
             }
         }, delayMillis);
