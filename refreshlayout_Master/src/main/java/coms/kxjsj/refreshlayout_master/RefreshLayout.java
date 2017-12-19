@@ -263,7 +263,8 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     }
 
     public void NotifyCompleteRefresh0() {
-        callbackState(scrolls <= 0 ? State.REFRESHCOMPLETE : State.LOADINGCOMPLETE);
+        state=scrolls<=0?State.REFRESHCOMPLETE:State.LOADINGCOMPLETE;
+        callbackState(state);
         mHeader.postDelayed(new Runnable() {
             @Override
             public void run() {
