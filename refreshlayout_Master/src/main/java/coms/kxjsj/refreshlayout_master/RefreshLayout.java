@@ -170,9 +170,6 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         Log.i(TAG, "onLayout: " + changed);
-//        if (!changed) {
-//            return;
-//        }
         FrameLayout.LayoutParams layoutParams = (LayoutParams) mScroll.getLayoutParams();
         mScroll.layout(left, top, right, bottom);
         if (orentation == Orentation.VERTICAL) {
@@ -454,6 +451,9 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     }
 
     private void doScroll(boolean isvertical) {
+        if(attrsUtils.isOVERSCROLL()&&attrsUtils.EVALATEABLE){
+            return;
+        }
         if (isvertical) {
             scrollTo(0, scrolls);
         } else {
@@ -525,7 +525,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
      */
     public static class AttrsUtils {
         private int HEADER_LAYOUTID, SCROLL_LAYOUT_ID, FOOTER_LAYOUTID;
-        private boolean CANHEADER = false, CANFOOTR = false, OVERSCROLL = false;
+        private boolean CANHEADER = false, CANFOOTR = false, OVERSCROLL = false,EVALATEABLE=false;
 
         private Orentation orentation = Orentation.VERTICAL;
         private int mMaxHeadertScroll = -1, mMaxFooterScroll = -1, mHeaderRefreshPosition = -1, mFooterRefreshPosition = -1, mFlingmax = -1, mHeaderRefreshCompletePosition, mFooterLoadingCompletePosition;
@@ -549,6 +549,8 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             CANHEADER = typedArray.getBoolean(R.styleable.RefreshLayout_canHeader, builder.CANHEADER_DEFAULT);
 
             CANFOOTR = typedArray.getBoolean(R.styleable.RefreshLayout_canFooter, builder.CANFOOTR_DEFAULT);
+
+            EVALATEABLE = typedArray.getBoolean(R.styleable.RefreshLayout_evaluateable, builder.EVALATEABLE);
 
             OVERSCROLL = typedArray.getBoolean(R.styleable.RefreshLayout_overscroll, builder.OVERSCROLL_DEFAULT);
 
@@ -627,7 +629,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
      */
     public static class DefaultBuilder {
         private int HEADER_LAYOUTID_DEFAULT, SCROLL_LAYOUT_ID_DEFAULT, FOOTER_LAYOUTID_DEFAULT;
-        private boolean CANHEADER_DEFAULT = true, CANFOOTR_DEFAULT = false, OVERSCROLL_DEFAULT = false;
+        private boolean CANHEADER_DEFAULT = true, CANFOOTR_DEFAULT = true, OVERSCROLL_DEFAULT = false,EVALATEABLE=false;
         private Class defaultRefreshWrap = BaseRefreshWrap.class;
 
         public DefaultBuilder setBaseRefreshWrap(Class defaultRefreshWrap) {
@@ -713,6 +715,14 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
     public void setmMaxFooterScroll(int mMaxFooterScroll) {
         this.mMaxFooterScroll = mMaxFooterScroll;
+    }
+
+    public AttrsUtils getAttrsUtils() {
+        return attrsUtils;
+    }
+
+    public void setAttrsUtils(AttrsUtils attrsUtils) {
+        this.attrsUtils = attrsUtils;
     }
 
     public int getmHeaderRefreshPosition() {

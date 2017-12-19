@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="RefreshLayout">
+        <!--是否可下拉刷新-->
         <attr name="canHeader" format="boolean" />
+        <!--是否可上拉加载-->
         <attr name="canFooter" format="boolean" />
+        <attr name="evaluateable" format="boolean" />
         <attr name="overscroll" format="boolean" />
         <attr name="headerID" format="reference" />
         <attr name="scrollID" format="reference" />
