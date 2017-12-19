@@ -34,10 +34,12 @@ public class MyRefreshWrap extends RefreshLayout.BaseRefreshWrap<String> {
         if(currentState== RefreshLayout.State.REFRESHCOMPLETE||currentState== RefreshLayout.State.REFRESHING){
             return;
         }
-        if (mHeadertextView!=null&&scrolls > getRefreshLayout().getmHeaderRefreshPosition()) {
-            mHeadertextView.setText(title[1]);
-        } else {
-            mHeadertextView.setText(title[0]);
+        if(mHeadertextView!=null) {
+            if (mHeadertextView != null && scrolls > getRefreshLayout().getmHeaderRefreshPosition()) {
+                mHeadertextView.setText(title[1]);
+            } else {
+                mHeadertextView.setText(title[0]);
+            }
         }
 
     }
@@ -49,10 +51,12 @@ public class MyRefreshWrap extends RefreshLayout.BaseRefreshWrap<String> {
         if(currentState== RefreshLayout.State.LOADINGCOMPLETE||currentState==RefreshLayout.State.LOADING){
             return;
         }
-        if (mfootertextView!=null&&scrolls > getRefreshLayout().getmFooterRefreshPosition()) {
-            mfootertextView.setText(title[4]);
-        } else {
-            mfootertextView.setText(title[3]);
+        if(mfootertextView != null ) {
+            if (mfootertextView != null && scrolls > getRefreshLayout().getmFooterRefreshPosition()) {
+                mfootertextView.setText(title[4]);
+            } else {
+                mfootertextView.setText(title[3]);
+            }
         }
     }
 
@@ -61,7 +65,7 @@ public class MyRefreshWrap extends RefreshLayout.BaseRefreshWrap<String> {
         switch (state) {
             case REFRESHCOMPLETE:
                 mHeaderPrgress.setVisibility(View.INVISIBLE);
-                mHeadertextView.setText(data);
+                mHeadertextView.setText(data == null ? title[6] : data);
                 break;
             case LOADING:
                 mfootPrgress.setVisibility(View.VISIBLE);
@@ -73,7 +77,7 @@ public class MyRefreshWrap extends RefreshLayout.BaseRefreshWrap<String> {
                 break;
             case LOADINGCOMPLETE:
                 mfootPrgress.setVisibility(View.INVISIBLE);
-                mfootertextView.setText(data);
+                mfootertextView.setText(data == null ? title[7] : data);
                 break;
             case IDEL:
                 break;
@@ -100,8 +104,8 @@ public class MyRefreshWrap extends RefreshLayout.BaseRefreshWrap<String> {
             mfootertextView = footer.findViewById(R.id.textView);
             mfootPrgress = footer.findViewById(R.id.progressBar);
         }
-        String[] tempVertical={"下拉刷新", "释放刷新", "正在刷新中", "上拉加载", "释放加载", "正在加载中"};
-        String[] tempHorizontal={"右拉刷新", "释放刷新", "正在刷新中", "左拉加载", "释放加载", "正在加载中"};
+        String[] tempVertical={"下拉刷新", "释放刷新", "正在刷新中", "上拉加载", "释放加载", "正在加载中", "刷新完成", "加载完成"};
+        String[] tempHorizontal={"右拉刷新", "释放刷新", "正在刷新中", "左拉加载", "释放加载", "正在加载中", "刷新完成", "加载完成"};
         title=(layout.getOrentation()== RefreshLayout.Orentation.VERTICAL)?
                 tempVertical:tempHorizontal;
     }
