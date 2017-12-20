@@ -100,7 +100,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
      * 加载完成位置
      */
     public enum State {
-        REFRESHING, LOADING, PULL_HEADER, PULL_FOOTER, IDEL, REFRESHCOMPLETE, LOADINGCOMPLETE
+        REFRESHING, LOADING, REFRESHCOMPLETE, LOADINGCOMPLETE, PULL_HEADER, PULL_FOOTER, IDEL
     }
 
     public RefreshLayout(@NonNull Context context) {
@@ -280,7 +280,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
      */
     public void NotifyCompleteRefresh1(Object obj) {
         baseRefreshWrap.setData(obj);
-        if (state == State.REFRESHING || state == State.LOADING) {
+        if (state.ordinal()<2) {
             state = state == State.REFRESHING ? State.REFRESHCOMPLETE : State.LOADINGCOMPLETE;
             int position = state == State.REFRESHING ? -mHeaderRefreshCompletePosition : mFooterRefreshPosition;
             if (position == 0) {
@@ -301,7 +301,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
      */
     public void NotifyCompleteRefresh1(int position, Object obj) {
         baseRefreshWrap.setData(obj);
-        if (state == State.REFRESHING || state == State.LOADING) {
+        if (state.ordinal()<2) {
             state = state == State.REFRESHING ? State.REFRESHCOMPLETE : State.LOADINGCOMPLETE;
             if (position == 0) {
                 callbackState(state);
@@ -317,7 +317,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
      * 设置动画到正在刷新
      */
     public void setRefreshing() {
-        if (state != State.REFRESHING || state != State.LOADING) {
+        if (state.ordinal()>3) {
             state = State.REFRESHING;
             aninatorTo(scrolls, -mHeaderRefreshPosition);
         }
@@ -380,7 +380,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     public void onStopNestedScroll(@NonNull View target) {
         helper.onStopNestedScroll(target);
 
-        if (scrolls != 0 && (state != State.REFRESHING && state != State.LOADING)) {
+        if (scrolls != 0 && (state.ordinal()>3)) {
             changeState(scrolls);
             int mRefreshPosition = scrolls > 0 ? mFooterRefreshPosition : mHeaderRefreshPosition;
             if (Math.abs(scrolls) >= mRefreshPosition && !attrsUtils.isOVERSCROLL()) {
@@ -420,7 +420,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
     @Override
     public void onNestedScroll(@NonNull View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-        if (state == State.REFRESHING || state == State.LOADING) {
+        if (state.ordinal()<4) {
             return;
         } else if (valueAnimator.isRunning()) {
             valueAnimator.cancel();
@@ -443,7 +443,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
     @Override
     public void onNestedPreScroll(@NonNull View target, int dx, int dy, @Nullable int[] consumed) {
-        if (state == State.REFRESHING || state == State.LOADING) {
+        if (state.ordinal()<4) {
             return;
         }
         boolean isvertical = orentation == Orentation.VERTICAL;
