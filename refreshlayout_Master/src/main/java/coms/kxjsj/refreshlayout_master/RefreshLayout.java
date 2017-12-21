@@ -462,6 +462,15 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         helper.onNestedScrollAccepted(child, target, axes);
     }
 
+    @Override
+    public boolean onNestedPreFling(View target, float velocityX, float velocityY) {
+        return false;
+    }
+
+    @Override
+    public boolean onNestedFling(View target, float velocityX, float velocityY, boolean consumed) {
+        return false;
+    }
 
     @Override
     public int getNestedScrollAxes() {

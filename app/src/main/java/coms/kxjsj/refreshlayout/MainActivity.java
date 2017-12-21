@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         layout.setListener(new RefreshLayout.Callback1<RefreshLayout.State>() {
             @Override
             public void call(RefreshLayout.State state) {
-                super.call(state);
+
                 if(state== RefreshLayout.State.REFRESHING||state== RefreshLayout.State.LOADING){
                     layout.postDelayed(new Runnable() {
                         @Override
