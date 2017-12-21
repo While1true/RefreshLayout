@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.NestedScrollingParent;
 import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewParentCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -463,15 +462,6 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         helper.onNestedScrollAccepted(child, target, axes);
     }
 
-    @Override
-    public boolean onNestedPreFling(View target, float velocityX, float velocityY) {
-        return ViewParentCompat.onNestedPreFling(this,target, velocityX, velocityY);
-    }
-
-    @Override
-    public boolean onNestedFling(View target, float velocityX, float velocityY, boolean consumed) {
-        return ViewParentCompat.onNestedFling(this,target, velocityX, velocityY, consumed);
-    }
 
     @Override
     public int getNestedScrollAxes() {
