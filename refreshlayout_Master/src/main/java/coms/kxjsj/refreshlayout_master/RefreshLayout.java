@@ -872,16 +872,17 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
     @Override
     public void scrollTo(int x, int y) {
-        y = caculateZhangli(y, attrsUtils.getmMaxHeadertScroll() / 3);
+        int temp=attrsUtils.orentation==Orentation.VERTICAL?y:x;
+        temp = caculateZhangli(temp, attrsUtils.getmMaxHeadertScroll() / 3);
         if (attrsUtils.isOVERSCROLL() && attrsUtils.isOVERSCROLL_ELASTIC()) {
-            if (y <= 0) {
+            if (temp <= 0) {
                 mScroll.setPivotX(0);
                 mScroll.setPivotY(0);
             } else {
-                mScroll.setPivotX(0);
-                mScroll.setPivotY(mScroll.getMeasuredHeight());
+                mScroll.setPivotX(attrsUtils.orentation==Orentation.VERTICAL?0:mScroll.getMeasuredWidth());
+                mScroll.setPivotY(attrsUtils.orentation==Orentation.VERTICAL?mScroll.getMeasuredHeight():0);
             }
-            mScroll.setScaleY(Math.min(1.4f, 1f + (float) Math.abs(y) / attrsUtils.getmMaxHeadertScroll() / 3));
+            mScroll.setScaleY(Math.min(1.4f, 1f + (float) Math.abs(temp) / attrsUtils.getmMaxHeadertScroll() / 3));
         } else {
             super.scrollTo(x, y);
         }
