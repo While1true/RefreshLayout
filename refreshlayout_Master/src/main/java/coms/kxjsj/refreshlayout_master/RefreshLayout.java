@@ -585,8 +585,13 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
             if (OVERSCROLL == null)
                 OVERSCROLL = typedArray.getBoolean(R.styleable.RefreshLayout_overscroll, builder.OVERSCROLL_DEFAULT);
-            if (OVERSCROLL_ELASTIC == null)
+
+            if (OVERSCROLL_ELASTIC == null) {
                 OVERSCROLL_ELASTIC = typedArray.getBoolean(R.styleable.RefreshLayout_elastic_overscroll, builder.OVERSCROLL_ELASTIC_DEFAULT);
+                if (OVERSCROLL_ELASTIC) {
+                    OVERSCROLL = true;
+                }
+            }
 
             int orentation = typedArray.getInt(R.styleable.RefreshLayout_orentation, 1);
             if (orentation == 0) {
@@ -840,18 +845,44 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         return (T) baseRefreshWrap;
     }
 
+    /**
+     * 1+1/2+1/3+……+1/n=lnn+R
+     * R为欧拉常数,约为0.5772.
+     * 1 1/2 1/3 1/4 1/5
+     *
+     * @param current
+     * @param base
+     * @return
+     */
+    private int caculateZhangli(int current, int base) {
+        float signum = Math.signum(current);
+        int pullrate = Math.abs(current) / base;
+        if (pullrate == 0) {
+            return current;
+        } else if (pullrate == 1)
+            return (int) (signum * base + signum * (Math.abs(current) % base) / 3);
+        else if (pullrate == 2) {
+            return (int) (1.333333333f * signum * base + signum * (Math.abs(current) % base) / 4);
+        } else if (pullrate == 3) {
+            return (int) (1.583333333f * signum * base + signum * (Math.abs(current) % base) / 5);
+        } else {
+            return (int) (1.783333333f * signum * base + signum * (Math.abs(current) % base) / 6);
+        }
+    }
+
     @Override
     public void scrollTo(int x, int y) {
-        if (attrsUtils.isOVERSCROLL() && attrsUtils.isOVERSCROLL_ELASTIC()){
-            if(y<=0){
+        y = caculateZhangli(y, attrsUtils.getmMaxHeadertScroll() / 3);
+        if (attrsUtils.isOVERSCROLL() && attrsUtils.isOVERSCROLL_ELASTIC()) {
+            if (y <= 0) {
                 mScroll.setPivotX(0);
                 mScroll.setPivotY(0);
-            }else{
+            } else {
                 mScroll.setPivotX(0);
                 mScroll.setPivotY(mScroll.getMeasuredHeight());
             }
-            mScroll.setScaleY(Math.min(1.5f,1f+(float)Math.abs(y)/attrsUtils.mMaxFooterScroll));
-        }else {
+            mScroll.setScaleY(Math.min(1.4f, 1f + (float) Math.abs(y) / attrsUtils.getmMaxHeadertScroll() / 3));
+        } else {
             super.scrollTo(x, y);
         }
     }
