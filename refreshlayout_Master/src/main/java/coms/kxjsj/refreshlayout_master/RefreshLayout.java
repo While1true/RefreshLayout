@@ -125,6 +125,9 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         Log.i(TAG, "onLayout: " + changed + "hash" + hashCode() + "Size:" + left + "-" + top + "-" + right + "-" + bottom);
+        if(top==bottom||left==right){
+            return;
+        }
         FrameLayout.LayoutParams layoutParams = (LayoutParams) mScroll.getLayoutParams();
         right = right - left;
         bottom = bottom - top;
