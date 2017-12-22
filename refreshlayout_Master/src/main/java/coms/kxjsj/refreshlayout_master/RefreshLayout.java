@@ -544,7 +544,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         /**
          * 头部 尾部是否可滑
          */
-        private Boolean CANHEADER = null, CANFOOTR = null, OVERSCROLL = null;
+        private Boolean CANHEADER = null, CANFOOTR = null, OVERSCROLL = null, OVERSCROLL_ELASTIC = null;
 
         /**
          * 滑动方向
@@ -585,6 +585,8 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
             if (OVERSCROLL == null)
                 OVERSCROLL = typedArray.getBoolean(R.styleable.RefreshLayout_overscroll, builder.OVERSCROLL_DEFAULT);
+            if (OVERSCROLL_ELASTIC == null)
+                OVERSCROLL_ELASTIC = typedArray.getBoolean(R.styleable.RefreshLayout_elastic_overscroll, builder.OVERSCROLL_ELASTIC_DEFAULT);
 
             int orentation = typedArray.getInt(R.styleable.RefreshLayout_orentation, 1);
             if (orentation == 0) {
@@ -662,6 +664,10 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         public int getmFooterLoadingCompletePosition() {
             return mFooterLoadingCompletePosition;
         }
+
+        public boolean isOVERSCROLL_ELASTIC() {
+            return OVERSCROLL_ELASTIC;
+        }
     }
 
     /**
@@ -669,7 +675,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
      */
     public static class DefaultBuilder {
         private int HEADER_LAYOUTID_DEFAULT, SCROLL_LAYOUT_ID_DEFAULT, FOOTER_LAYOUTID_DEFAULT;
-        private boolean CANHEADER_DEFAULT = true, CANFOOTR_DEFAULT = true, OVERSCROLL_DEFAULT = false;
+        private boolean CANHEADER_DEFAULT = true, CANFOOTR_DEFAULT = true, OVERSCROLL_DEFAULT = false, OVERSCROLL_ELASTIC_DEFAULT = false;
         private Class defaultRefreshWrap = BaseRefreshWrap.class;
 
         public DefaultBuilder setBaseRefreshWrap(Class defaultRefreshWrap) {
@@ -706,6 +712,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             OVERSCROLL_DEFAULT = overscrollDefault;
             return this;
         }
+
     }
 
 
@@ -731,6 +738,11 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         protected void setData(Object data) {
             this.data = (T) data;
         }
+    }
+
+    public void setOverScrollElastic(boolean elastic) {
+        attrsUtils.OVERSCROLL_ELASTIC = elastic;
+        attrsUtils.OVERSCROLL = true;
     }
 
     public void setOrentation(Orentation orentation) {
@@ -826,5 +838,21 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
     public <T extends BaseRefreshWrap> T getBaseRefreshWrap() {
         return (T) baseRefreshWrap;
+    }
+
+    @Override
+    public void scrollTo(int x, int y) {
+        if (attrsUtils.isOVERSCROLL() && attrsUtils.isOVERSCROLL_ELASTIC()){
+            if(y<=0){
+                mScroll.setPivotX(0);
+                mScroll.setPivotY(0);
+            }else{
+                mScroll.setPivotX(0);
+                mScroll.setPivotY(mScroll.getMeasuredHeight());
+            }
+            mScroll.setScaleY(Math.min(1.5f,1f+(float)Math.abs(y)/attrsUtils.mMaxFooterScroll));
+        }else {
+            super.scrollTo(x, y);
+        }
     }
 }
