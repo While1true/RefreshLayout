@@ -8,37 +8,37 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import coms.kxjsj.refreshlayout_master.MyRefreshWrap;
-import coms.kxjsj.refreshlayout_master.RefreshLayout;
+import coms.kxjsj.refreshlayout_master.RefreshLayout_o;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RefreshLayout.init(new RefreshLayout.DefaultBuilder().setBaseRefreshWrap(MyRefreshWrap.class));
+        RefreshLayout_o.init(new RefreshLayout_o.DefaultBuilder().setBaseRefreshWrap(MyRefreshWrap.class));
         setContentView(R.layout.activity_main);
 
-        final RefreshLayout layout=findViewById(R.id.Refresh);
-        layout.setListener(new RefreshLayout.Callback1<RefreshLayout.State>() {
+        final RefreshLayout_o layout=findViewById(R.id.Refresh);
+        layout.setListener(new RefreshLayout_o.Callback1<RefreshLayout_o.State>() {
             @Override
-            public void call(RefreshLayout.State state) {
+            public void call(RefreshLayout_o.State state) {
 
-                if(state== RefreshLayout.State.REFRESHING||state== RefreshLayout.State.LOADING){
+                if(state== RefreshLayout_o.State.REFRESHING||state== RefreshLayout_o.State.LOADING){
                     layout.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            layout.NotifyCompleteRefresh1(layout.findInHeaderView(R.id.textView).getMeasuredWidth()+10,"为你更新了很多信息");
+                            layout.NotifyCompleteRefresh1(layout.findInHeaderView(R.id.textView).getMeasuredHeight()+25,"为你更新了很多信息");
                         }
                     },3000);
                 }
             }
             @Override
-            public void call(RefreshLayout.State state, int scroll) {
+            public void call(RefreshLayout_o.State state, int scroll) {
                 super.call(state, scroll);
             }
         });
         RecyclerView recyclerView=layout.getmScroll();
-        recyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
         recyclerView.setAdapter(new RecyclerView.Adapter() {
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -57,9 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public int getItemCount() {
-                return 30;
+                return 60;
             }
         });
-        layout.setOrentation(RefreshLayout.Orentation.HORIZONTAL);
     }
 }

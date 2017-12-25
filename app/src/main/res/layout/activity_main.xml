@@ -6,13 +6,13 @@
     android:layout_height="match_parent"
    >
 
-    <coms.kxjsj.refreshlayout_master.RefreshLayout
+    <coms.kxjsj.refreshlayout_master.RefreshLayout_o
         android:id="@+id/Refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:canFooter="true"
-        app:footerID="@layout/footer_layout_horizontal"
-        app:headerID="@layout/header_layout_horizontal"
+        app:footerID="@layout/footer_layout"
+        app:headerID="@layout/header_layout"
         app:scrollID="@layout/xx" />
 
 </FrameLayout>
