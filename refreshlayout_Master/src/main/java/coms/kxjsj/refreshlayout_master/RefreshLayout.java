@@ -882,8 +882,8 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             }
             mScroll.setScaleY(Math.min(1.4f, 1f + (float) Math.abs(temp) / attrsUtils.getmMaxHeadertScroll() / 3));
         } else {
-            x = caculateZhangli(x, x<=0?mHeader.getMeasuredWidth():mFooter.getMeasuredWidth());
-            y = caculateZhangli(y, y<0?mHeader.getMeasuredHeight():mFooter.getMeasuredHeight());
+            x = caculateZhangli(x, x<=0?(mHeader==null?attrsUtils.mMaxHeaderScroll/3:mHeader.getMeasuredWidth()):(mFooter==null?attrsUtils.mMaxFooterScroll/3:mFooter.getMeasuredWidth()));
+            y = caculateZhangli(y, y<0?(mHeader==null?attrsUtils.mMaxHeaderScroll/3:mHeader.getMeasuredHeight()):(mFooter==null?attrsUtils.mMaxFooterScroll/3:mFooter.getMeasuredHeight()));
             super.scrollTo(x, y);
         }
     }
