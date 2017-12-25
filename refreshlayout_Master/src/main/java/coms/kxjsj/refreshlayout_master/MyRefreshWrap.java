@@ -11,27 +11,27 @@ import java.lang.ref.WeakReference;
  * Created by vange on 2017/12/15.
  */
 
-public class MyRefreshWrap extends RefreshLayout_o.BaseRefreshWrap<String> {
+public class MyRefreshWrap extends RefreshLayout.BaseRefreshWrap<String> {
     private ImageView mHeaderimageView;
     private TextView mHeadertextView;
     private ProgressBar mHeaderPrgress;
     private ImageView mFooterimageView;
     private TextView mfootertextView;
     private ProgressBar mfootPrgress;
-    private WeakReference<RefreshLayout_o> layoutWeakReference;
+    private WeakReference<RefreshLayout> layoutWeakReference;
 
-    public RefreshLayout_o getRefreshLayout() {
+    public RefreshLayout getRefreshLayout() {
         return layoutWeakReference.get();
     }
 
-    private RefreshLayout_o.State currentState;
+    private RefreshLayout.State currentState;
     String[] title;
 
     public void onPullHeader(View view, int scrolls) {
         /**
          * 完成状态时不要改变字
          */
-        if(currentState== RefreshLayout_o.State.REFRESHCOMPLETE||currentState== RefreshLayout_o.State.REFRESHING){
+        if(currentState== RefreshLayout.State.REFRESHCOMPLETE||currentState== RefreshLayout.State.REFRESHING){
             return;
         }
         if(mHeadertextView!=null) {
@@ -48,7 +48,7 @@ public class MyRefreshWrap extends RefreshLayout_o.BaseRefreshWrap<String> {
         /**
          * 完成状态时不要改变字
          */
-        if(currentState== RefreshLayout_o.State.LOADINGCOMPLETE||currentState== RefreshLayout_o.State.LOADING){
+        if(currentState== RefreshLayout.State.LOADINGCOMPLETE||currentState== RefreshLayout.State.LOADING){
             return;
         }
         if(mfootertextView != null ) {
@@ -60,7 +60,7 @@ public class MyRefreshWrap extends RefreshLayout_o.BaseRefreshWrap<String> {
         }
     }
 
-    public void OnStateChange(RefreshLayout_o.State state) {
+    public void OnStateChange(RefreshLayout.State state) {
         currentState=state;
         switch (state) {
             case REFRESHCOMPLETE:
@@ -89,9 +89,9 @@ public class MyRefreshWrap extends RefreshLayout_o.BaseRefreshWrap<String> {
 
     }
     @Override
-    protected void initView(RefreshLayout_o layout) {
+    protected void initView(RefreshLayout layout) {
         super.initView(layout);
-        layoutWeakReference=new WeakReference<RefreshLayout_o>(layout);
+        layoutWeakReference=new WeakReference<RefreshLayout>(layout);
         View header = layout.getmHeader();
         View footer = layout.getmFooter();
         if(header!=null) {
@@ -106,7 +106,7 @@ public class MyRefreshWrap extends RefreshLayout_o.BaseRefreshWrap<String> {
         }
         String[] tempVertical={"下拉刷新", "释放刷新", "正在刷新中", "上拉加载", "释放加载", "正在加载中", "刷新完成", "加载完成"};
         String[] tempHorizontal={"右拉刷新", "释放刷新", "正在刷新中", "左拉加载", "释放加载", "正在加载中", "刷新完成", "加载完成"};
-        title=(layout.getOrentation()== RefreshLayout_o.Orentation.VERTICAL)?
+        title=(layout.getOrentation()== RefreshLayout.Orentation.VERTICAL)?
                 tempVertical:tempHorizontal;
     }
 }

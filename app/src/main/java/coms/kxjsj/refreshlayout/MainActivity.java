@@ -8,22 +8,22 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import coms.kxjsj.refreshlayout_master.MyRefreshWrap;
-import coms.kxjsj.refreshlayout_master.RefreshLayout_o;
+import coms.kxjsj.refreshlayout_master.RefreshLayout;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RefreshLayout_o.init(new RefreshLayout_o.DefaultBuilder().setBaseRefreshWrap(MyRefreshWrap.class));
+        RefreshLayout.init(new RefreshLayout.DefaultBuilder().setBaseRefreshWrap(MyRefreshWrap.class));
         setContentView(R.layout.activity_main);
 
-        final RefreshLayout_o layout=findViewById(R.id.Refresh);
-        layout.setListener(new RefreshLayout_o.Callback1<RefreshLayout_o.State>() {
+        final RefreshLayout layout=findViewById(R.id.Refresh);
+        layout.setListener(new RefreshLayout.Callback1<RefreshLayout.State>() {
             @Override
-            public void call(RefreshLayout_o.State state) {
+            public void call(RefreshLayout.State state) {
 
-                if(state== RefreshLayout_o.State.REFRESHING||state== RefreshLayout_o.State.LOADING){
+                if(state== RefreshLayout.State.REFRESHING||state== RefreshLayout.State.LOADING){
                     layout.postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             @Override
-            public void call(RefreshLayout_o.State state, int scroll) {
+            public void call(RefreshLayout.State state, int scroll) {
                 super.call(state, scroll);
             }
         });
