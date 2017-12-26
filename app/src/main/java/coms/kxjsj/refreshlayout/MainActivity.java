@@ -5,12 +5,17 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import coms.kxjsj.refreshlayout_master.MyRefreshWrap;
 import coms.kxjsj.refreshlayout_master.RefreshLayout;
 
 public class MainActivity extends AppCompatActivity {
+    private ImageView img;
+    private int height;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
                     layout.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            layout.NotifyCompleteRefresh1(layout.findInHeaderView(R.id.textView).getMeasuredHeight()+25,"为你更新了很多信息");
+                            layout.NotifyCompleteRefresh1(layout.findInHeaderView(R.id.textView).getMeasuredHeight(),"为你更新了很多信息");
                         }
                     },3000);
                 }
@@ -35,6 +40,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void call(RefreshLayout.State state, int scroll) {
                 super.call(state, scroll);
+                if(state== RefreshLayout.State.PULL_HEADER){
+                    if(height==0) {
+                        height = img.getMeasuredHeight();
+                    }
+                    img.getLayoutParams().height=height+Math.abs(scroll);
+                    img.requestLayout();
+                }
             }
         });
         RecyclerView recyclerView=layout.getmScroll();
@@ -52,7 +64,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
+                if(position==0) {
+                    img = holder.itemView.findViewById(R.id.img);
+                    img.setVisibility(View.VISIBLE);
+                }else {
+                    holder.itemView.findViewById(R.id.img).setVisibility(View.GONE);
+                }
+                ((TextView) holder.itemView.findViewById(R.id.item)).setText(position+"");
             }
 
             @Override

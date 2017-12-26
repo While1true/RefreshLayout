@@ -10,7 +10,7 @@
         android:id="@+id/Refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:canFooter="true"
+        app:evaluateable="true"
         app:footerID="@layout/footer_layout"
         app:headerID="@layout/header_layout"
         app:scrollID="@layout/xx" />
