@@ -430,9 +430,11 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             scrolls += dscroll/attrsUtils.PULLRATE;
             checkBounds(scrolltemp);
             if (isvertical) {
-                consumed[1] = scrolls - scrolltemp;
+                consumed[1] = dscroll;
+//                consumed[1] = scrolls - scrolltemp;
             } else {
-                consumed[0] = scrolls - scrolltemp;
+                consumed[0] = dscroll;
+//                consumed[0] = scrolls - scrolltemp;
             }
             doScroll(isvertical);
             changeState(scrolltemp, dscroll);
@@ -697,7 +699,8 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
      * 保存全局默认配置
      */
     public static class DefaultBuilder {
-        private int HEADER_LAYOUTID_DEFAULT, SCROLL_LAYOUT_ID_DEFAULT, FOOTER_LAYOUTID_DEFAULT,PULLRATE = 2;
+        private int HEADER_LAYOUTID_DEFAULT, SCROLL_LAYOUT_ID_DEFAULT, FOOTER_LAYOUTID_DEFAULT;
+        private float PULLRATE = 2.5f;
         private boolean CANHEADER_DEFAULT = true, CANFOOTR_DEFAULT = true, OVERSCROLL_DEFAULT = false, OVERSCROLL_ELASTIC_DEFAULT = false;
         private Class defaultRefreshWrap = BaseRefreshWrap.class;
 
