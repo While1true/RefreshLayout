@@ -129,10 +129,10 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             return;
         }
         LayoutParams layoutParams = (LayoutParams) mScroll.getLayoutParams();
-        right = right - left;
-        bottom = bottom - top;
-        top = 0;
-        left = 0;
+        right = right - left-getPaddingRight();
+        bottom = bottom - top-getPaddingBottom();
+        top = getPaddingTop();
+        left = getPaddingLeft();
         mScroll.layout(left + layoutParams.leftMargin, top + layoutParams.topMargin, right - layoutParams.rightMargin, bottom - layoutParams.bottomMargin);
         if (attrsUtils.orentation == Orentation.VERTICAL) {
             if (attrsUtils.isOVERSCROLL()) {
@@ -208,7 +208,9 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             }
 
         }
-        baseRefreshWrap.initView(this);
+        if(changed) {
+            baseRefreshWrap.initView(this);
+        }
 
     }
 
@@ -374,8 +376,8 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     }
 
     private void checkBounds(int scrolltemp) {
-        int maxheader = 0;
-        int maxfooter = 0;
+        int maxheader;
+        int maxfooter;
         if (attrsUtils.isOVERSCROLL()) {
             maxheader = scrolltemp <= 0 ? attrsUtils.mMaxHeaderScroll : 0;
             maxfooter = scrolltemp >= 0 ? attrsUtils.mMaxHeaderScroll : 0;
@@ -406,7 +408,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
         if ((dscroll < 0 && !canScroll(isvertical, -1)) || (dscroll > 0 && !canScroll(isvertical, 1))) {
             int tempscrolls = scrolls;
-            scrolls += dscroll;
+            scrolls += dscroll/attrsUtils.PULLRATE;
 //            System.out.println("onNestedScroll" + scrolls);
             checkBounds(tempscrolls);
             doScroll(isvertical);
@@ -425,7 +427,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         if ((dscroll > 0 && scrolls < 0) || (dscroll < 0 && scrolls > 0)) {
 //            System.out.println("onNestedPreScroll" + scrolls);
             int scrolltemp = scrolls;
-            scrolls += dscroll;
+            scrolls += dscroll/attrsUtils.PULLRATE;
             checkBounds(scrolltemp);
             if (isvertical) {
                 consumed[1] = scrolls - scrolltemp;
@@ -547,7 +549,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         /**
          * 头部 尾部是否可滑
          */
-        private Boolean CANHEADER = null, CANFOOTR = null, OVERSCROLL = null, OVERSCROLL_ELASTIC = null;
+        private Boolean CANHEADER = null, CANFOOTR = null, OVERSCROLL = null, OVERSCROLL_ELASTIC = null,EVALUATEABLE=null;
 
         /**
          * 滑动方向
@@ -563,6 +565,11 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
          * 刷新完成延迟时间
          */
         private int delayCompleteTime = 800;
+
+        /**
+         * 拉伸张力
+         */
+        private float PULLRATE=-1;
 
         private static void setBuilder(DefaultBuilder builderx) {
             builder = builderx;
@@ -595,6 +602,13 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
                 }
             }
 
+            if (EVALUATEABLE == null) {
+                EVALUATEABLE = typedArray.getBoolean(R.styleable.RefreshLayout_evaluateable, false);
+                if (EVALUATEABLE) {
+                    OVERSCROLL = true;
+                }
+            }
+
             int orentation = typedArray.getInt(R.styleable.RefreshLayout_orentation, 1);
             if (orentation == 0) {
                 this.orentation = Orentation.HORIZONTAL;
@@ -616,6 +630,8 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             if (delayCompleteTime == 800)
                 delayCompleteTime = typedArray.getInt(R.styleable.RefreshLayout_delayCompleteTime, delayCompleteTime);
 
+            if (PULLRATE == -1)
+                PULLRATE = typedArray.getFloat(R.styleable.RefreshLayout_pullrate, builder.PULLRATE);
 
             typedArray.recycle();
         }
@@ -681,7 +697,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
      * 保存全局默认配置
      */
     public static class DefaultBuilder {
-        private int HEADER_LAYOUTID_DEFAULT, SCROLL_LAYOUT_ID_DEFAULT, FOOTER_LAYOUTID_DEFAULT;
+        private int HEADER_LAYOUTID_DEFAULT, SCROLL_LAYOUT_ID_DEFAULT, FOOTER_LAYOUTID_DEFAULT,PULLRATE = 2;
         private boolean CANHEADER_DEFAULT = true, CANFOOTR_DEFAULT = true, OVERSCROLL_DEFAULT = false, OVERSCROLL_ELASTIC_DEFAULT = false;
         private Class defaultRefreshWrap = BaseRefreshWrap.class;
 
@@ -720,6 +736,13 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             return this;
         }
 
+        public DefaultBuilder setPullRate(int rate) {
+            if (rate > 0) {
+                PULLRATE = rate;
+            }
+            return this;
+        }
+
     }
 
 
@@ -745,6 +768,11 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         protected void setData(Object data) {
             this.data = (T) data;
         }
+    }
+
+    public void setPULLRATE(float pullrate) {
+        if(pullrate!=0)
+            attrsUtils.PULLRATE = pullrate;
     }
 
     public void setOrentation(Orentation orentation) {
@@ -869,7 +897,6 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
     @Override
     public void scrollTo(int x, int y) {
-        System.out.println("scrollTo" + y);
         int temp=attrsUtils.orentation== Orentation.VERTICAL?y:x;
         if (attrsUtils.isOVERSCROLL() && attrsUtils.isOVERSCROLL_ELASTIC()) {
             temp = caculateZhangli(temp, attrsUtils.getmMaxHeadertScroll() / 3);
@@ -882,9 +909,11 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             }
             mScroll.setScaleY(Math.min(1.4f, 1f + (float) Math.abs(temp) / attrsUtils.getmMaxHeadertScroll() / 3));
         } else {
-            x = caculateZhangli(x, x<=0?(mHeader==null?attrsUtils.mMaxHeaderScroll/3:mHeader.getMeasuredWidth()):(mFooter==null?attrsUtils.mMaxFooterScroll/3:mFooter.getMeasuredWidth()));
-            y = caculateZhangli(y, y<0?(mHeader==null?attrsUtils.mMaxHeaderScroll/3:mHeader.getMeasuredHeight()):(mFooter==null?attrsUtils.mMaxFooterScroll/3:mFooter.getMeasuredHeight()));
-            super.scrollTo(x, y);
+            if(!attrsUtils.EVALUATEABLE) {
+//                x = caculateZhangli(x, x <= 0 ? (mHeader == null ? attrsUtils.mMaxHeaderScroll / 3 : mHeader.getMeasuredWidth()) : (mFooter == null ? attrsUtils.mMaxFooterScroll / 3 : mFooter.getMeasuredWidth()));
+//                y = caculateZhangli(y, y < 0 ? (mHeader == null ? attrsUtils.mMaxHeaderScroll / 3 : mHeader.getMeasuredHeight()) : (mFooter == null ? attrsUtils.mMaxFooterScroll / 3 : mFooter.getMeasuredHeight()));
+                super.scrollTo(x, y);
+            }
         }
     }
 }

@@ -24,5 +24,6 @@
         <attr name="mFooterLoadingCompletePosition" format="dimension" />
         <attr name="mFlingmax" format="dimension" />
         <attr name="delayCompleteTime" format="integer" />
+        <attr name="pullrate" format="float" />
     </declare-styleable>
 </resources>

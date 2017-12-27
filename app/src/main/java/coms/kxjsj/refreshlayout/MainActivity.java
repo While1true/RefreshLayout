@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final RefreshLayout layout=findViewById(R.id.Refresh);
+        layout.setPULLRATE(1.8f);
         layout.setListener(new RefreshLayout.Callback1<RefreshLayout.State>() {
             @Override
             public void call(RefreshLayout.State state) {
