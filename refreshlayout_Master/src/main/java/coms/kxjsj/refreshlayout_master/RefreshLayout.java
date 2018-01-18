@@ -421,6 +421,8 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     public void onNestedPreScroll(@NonNull View target, int dx, int dy, @Nullable int[] consumed) {
         if (state.ordinal() < 4) {
             return;
+        }else if (valueAnimator.isRunning()) {
+            valueAnimator.cancel();
         }
         boolean isvertical = attrsUtils.orentation == Orentation.VERTICAL;
         int dscroll = isvertical ? dy - consumed[1] : dx - consumed[0];
