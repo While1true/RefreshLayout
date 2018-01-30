@@ -91,15 +91,24 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        initView(context);
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        initView(getContext());
     }
 
     private void initView(Context context) {
         helper = new NestedScrollingParentHelper(this);
         ViewCompat.setNestedScrollingEnabled(this, true);
         LayoutInflater inflater = LayoutInflater.from(context);
-        mScroll = inflater.inflate(attrsUtils.getScrollLayoutId(), this, false);
-        addView(mScroll);
+        if (getChildCount() > 0)
+            mScroll = getChildAt(0);
+        else {
+            mScroll = inflater.inflate(attrsUtils.getScrollLayoutId(), this, false);
+            addView(mScroll);
+        }
         if (!attrsUtils.isOVERSCROLL()) {
             if (attrsUtils.isCANHEADER()) {
                 mHeader = inflater.inflate(attrsUtils.getHeaderLayoutid(), this, false);
@@ -125,12 +134,12 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         Log.i(TAG, "onLayout: " + changed + "hash" + hashCode() + "Size:" + left + "-" + top + "-" + right + "-" + bottom);
-        if(top==bottom||left==right){
+        if (top == bottom || left == right) {
             return;
         }
         LayoutParams layoutParams = (LayoutParams) mScroll.getLayoutParams();
-        right = right - left-getPaddingRight();
-        bottom = bottom - top-getPaddingBottom();
+        right = right - left - getPaddingRight();
+        bottom = bottom - top - getPaddingBottom();
         top = getPaddingTop();
         left = getPaddingLeft();
         mScroll.layout(left + layoutParams.leftMargin, top + layoutParams.topMargin, right - layoutParams.rightMargin, bottom - layoutParams.bottomMargin);
@@ -208,7 +217,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             }
 
         }
-        if(changed) {
+        if (changed) {
             baseRefreshWrap.initView(this);
         }
 
@@ -408,7 +417,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
         if ((dscroll < 0 && !canScroll(isvertical, -1)) || (dscroll > 0 && !canScroll(isvertical, 1))) {
             int tempscrolls = scrolls;
-            scrolls += dscroll/attrsUtils.PULLRATE;
+            scrolls += dscroll / attrsUtils.PULLRATE;
 //            System.out.println("onNestedScroll" + scrolls);
             checkBounds(tempscrolls);
             doScroll(isvertical);
@@ -421,7 +430,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     public void onNestedPreScroll(@NonNull View target, int dx, int dy, @Nullable int[] consumed) {
         if (state.ordinal() < 4) {
             return;
-        }else if (valueAnimator.isRunning()) {
+        } else if (valueAnimator.isRunning()) {
             valueAnimator.cancel();
         }
         boolean isvertical = attrsUtils.orentation == Orentation.VERTICAL;
@@ -429,7 +438,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         if ((dscroll > 0 && scrolls < 0) || (dscroll < 0 && scrolls > 0)) {
 //            System.out.println("onNestedPreScroll" + scrolls);
             int scrolltemp = scrolls;
-            scrolls += dscroll/attrsUtils.PULLRATE;
+            scrolls += dscroll / attrsUtils.PULLRATE;
             checkBounds(scrolltemp);
             if (isvertical) {
                 consumed[1] = dscroll;
@@ -553,7 +562,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         /**
          * 头部 尾部是否可滑
          */
-        private Boolean CANHEADER = null, CANFOOTR = null, OVERSCROLL = null, OVERSCROLL_ELASTIC = null,EVALUATEABLE=null;
+        private Boolean CANHEADER = null, CANFOOTR = null, OVERSCROLL = null, OVERSCROLL_ELASTIC = null, EVALUATEABLE = null;
 
         /**
          * 滑动方向
@@ -573,7 +582,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         /**
          * 拉伸张力
          */
-        private float PULLRATE=-1;
+        private float PULLRATE = -1;
 
         private static void setBuilder(DefaultBuilder builderx) {
             builder = builderx;
@@ -776,7 +785,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     }
 
     public void setPULLRATE(float pullrate) {
-        if(pullrate!=0)
+        if (pullrate != 0)
             attrsUtils.PULLRATE = pullrate;
     }
 
@@ -902,19 +911,19 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
     @Override
     public void scrollTo(int x, int y) {
-        int temp=attrsUtils.orentation== Orentation.VERTICAL?y:x;
+        int temp = attrsUtils.orentation == Orentation.VERTICAL ? y : x;
         if (attrsUtils.isOVERSCROLL() && attrsUtils.isOVERSCROLL_ELASTIC()) {
             temp = caculateZhangli(temp, attrsUtils.getmMaxHeadertScroll() / 3);
             if (temp <= 0) {
                 mScroll.setPivotX(0);
                 mScroll.setPivotY(0);
             } else {
-                mScroll.setPivotX(attrsUtils.orentation== Orentation.VERTICAL?0:mScroll.getMeasuredWidth());
-                mScroll.setPivotY(attrsUtils.orentation== Orentation.VERTICAL?mScroll.getMeasuredHeight():0);
+                mScroll.setPivotX(attrsUtils.orentation == Orentation.VERTICAL ? 0 : mScroll.getMeasuredWidth());
+                mScroll.setPivotY(attrsUtils.orentation == Orentation.VERTICAL ? mScroll.getMeasuredHeight() : 0);
             }
             mScroll.setScaleY(Math.min(1.4f, 1f + (float) Math.abs(temp) / attrsUtils.getmMaxHeadertScroll() / 3));
         } else {
-            if(!attrsUtils.EVALUATEABLE) {
+            if (!attrsUtils.EVALUATEABLE) {
 //                x = caculateZhangli(x, x <= 0 ? (mHeader == null ? attrsUtils.mMaxHeaderScroll / 3 : mHeader.getMeasuredWidth()) : (mFooter == null ? attrsUtils.mMaxFooterScroll / 3 : mFooter.getMeasuredWidth()));
 //                y = caculateZhangli(y, y < 0 ? (mHeader == null ? attrsUtils.mMaxHeaderScroll / 3 : mHeader.getMeasuredHeight()) : (mFooter == null ? attrsUtils.mMaxFooterScroll / 3 : mFooter.getMeasuredHeight()));
                 super.scrollTo(x, y);
