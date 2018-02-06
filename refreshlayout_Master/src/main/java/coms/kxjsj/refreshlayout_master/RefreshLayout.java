@@ -86,6 +86,9 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             if (baseRefreshWrap == null) {
                 baseRefreshWrap = (BaseRefreshWrap) AttrsUtils.builder.defaultRefreshWrap.newInstance();
             }
+            if(!baseRefreshWrap.isOutHeaderAndFooter()){
+                attrsUtils.EVALUATEABLE=true;
+            }
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -109,7 +112,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             mScroll = inflater.inflate(attrsUtils.getScrollLayoutId(), this, false);
             addView(mScroll);
         }
-        if (!attrsUtils.isOVERSCROLL()) {
+        if (!attrsUtils.isOVERSCROLL()&&!attrsUtils.EVALUATEABLE) {
             if (attrsUtils.isCANHEADER()) {
                 mHeader = inflater.inflate(attrsUtils.getHeaderLayoutid(), this, false);
                 addView(mHeader);
@@ -133,7 +136,6 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        Log.i(TAG, "onLayout: " + changed + "hash" + hashCode() + "Size:" + left + "-" + top + "-" + right + "-" + bottom);
         if (top == bottom || left == right) {
             return;
         }
@@ -144,12 +146,15 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
         left = getPaddingLeft();
         mScroll.layout(left + layoutParams.leftMargin, top + layoutParams.topMargin, right - layoutParams.rightMargin, bottom - layoutParams.bottomMargin);
         if (attrsUtils.orentation == Orentation.VERTICAL) {
-            if (attrsUtils.isOVERSCROLL()) {
+            if (attrsUtils.isOVERSCROLL()||attrsUtils.EVALUATEABLE) {
                 if (attrsUtils.mMaxHeaderScroll == -1) {
                     attrsUtils.mMaxHeaderScroll = getMeasuredHeight() / 2;
                 }
                 if (attrsUtils.mMaxFooterScroll == -1) {
                     attrsUtils.mMaxFooterScroll = attrsUtils.mMaxHeaderScroll;
+                }
+                if (attrsUtils.mHeaderRefreshPosition == -1) {
+                    attrsUtils.mHeaderRefreshPosition = attrsUtils.mMaxHeaderScroll/3;
                 }
             } else {
                 if (mHeader != null) {
@@ -181,12 +186,15 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
             }
 
         } else {
-            if (attrsUtils.isOVERSCROLL()) {
+            if (attrsUtils.isOVERSCROLL()||attrsUtils.EVALUATEABLE) {
                 if (attrsUtils.mMaxHeaderScroll == -1) {
                     attrsUtils.mMaxHeaderScroll = getMeasuredWidth() / 2;
                 }
                 if (attrsUtils.mMaxFooterScroll == -1) {
                     attrsUtils.mMaxFooterScroll = attrsUtils.mMaxHeaderScroll;
+                }
+                if (attrsUtils.mHeaderRefreshPosition == -1) {
+                    attrsUtils.mHeaderRefreshPosition = attrsUtils.mMaxHeaderScroll/3;
                 }
             } else {
                 if (mHeader != null) {
@@ -372,7 +380,7 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     }
 
     private void changeState(int scrolls, int dy) {
-        State statex = null;
+        State statex;
         if (scrolls == 0) {
             statex = dy > 0 ? State.PULL_FOOTER : State.PULL_HEADER;
         } else {
@@ -496,17 +504,17 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
     }
 
 
-    Callback1<State> callback;
+    Callback callback;
 
-    public void setListener(Callback1<State> callback) {
+    public void setListener(Callback callback) {
         this.callback = callback;
     }
 
 
-    public abstract static class Callback1<T> {
-        public abstract void call(T t);
+    public abstract static class Callback {
+        public abstract void call(State t);
 
-        public void call(T t, int scroll) {
+        public void call(State t, int scroll) {
         }
     }
 
@@ -617,9 +625,6 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
             if (EVALUATEABLE == null) {
                 EVALUATEABLE = typedArray.getBoolean(R.styleable.RefreshLayout_evaluateable, false);
-                if (EVALUATEABLE) {
-                    OVERSCROLL = true;
-                }
             }
 
             int orentation = typedArray.getInt(R.styleable.RefreshLayout_orentation, 1);
@@ -777,6 +782,10 @@ public class RefreshLayout extends FrameLayout implements NestedScrollingParent,
 
         protected void initView(RefreshLayout layout) {
 
+        }
+        public boolean isOutHeaderAndFooter(){
+
+            return true;
         }
 
         protected void setData(Object data) {

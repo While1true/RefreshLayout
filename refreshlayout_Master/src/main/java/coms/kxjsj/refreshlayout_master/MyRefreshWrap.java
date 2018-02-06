@@ -12,10 +12,8 @@ import java.lang.ref.WeakReference;
  */
 
 public class MyRefreshWrap extends RefreshLayout.BaseRefreshWrap<String> {
-    private ImageView mHeaderimageView;
     private TextView mHeadertextView;
     private ProgressBar mHeaderPrgress;
-    private ImageView mFooterimageView;
     private TextView mfootertextView;
     private ProgressBar mfootPrgress;
     private WeakReference<RefreshLayout> layoutWeakReference;
@@ -31,10 +29,10 @@ public class MyRefreshWrap extends RefreshLayout.BaseRefreshWrap<String> {
         /**
          * 完成状态时不要改变字
          */
-        if(currentState== RefreshLayout.State.REFRESHCOMPLETE||currentState== RefreshLayout.State.REFRESHING){
+        if (currentState == RefreshLayout.State.REFRESHCOMPLETE || currentState == RefreshLayout.State.REFRESHING) {
             return;
         }
-        if(mHeadertextView!=null) {
+        if (mHeadertextView != null) {
             if (mHeadertextView != null && scrolls > getRefreshLayout().getmHeaderRefreshPosition()) {
                 mHeadertextView.setText(title[1]);
             } else {
@@ -48,10 +46,10 @@ public class MyRefreshWrap extends RefreshLayout.BaseRefreshWrap<String> {
         /**
          * 完成状态时不要改变字
          */
-        if(currentState== RefreshLayout.State.LOADINGCOMPLETE||currentState== RefreshLayout.State.LOADING){
+        if (currentState == RefreshLayout.State.LOADINGCOMPLETE || currentState == RefreshLayout.State.LOADING) {
             return;
         }
-        if(mfootertextView != null ) {
+        if (mfootertextView != null) {
             if (mfootertextView != null && scrolls > getRefreshLayout().getmFooterRefreshPosition()) {
                 mfootertextView.setText(title[4]);
             } else {
@@ -61,23 +59,31 @@ public class MyRefreshWrap extends RefreshLayout.BaseRefreshWrap<String> {
     }
 
     public void OnStateChange(RefreshLayout.State state) {
-        currentState=state;
+        currentState = state;
         switch (state) {
             case REFRESHCOMPLETE:
-                mHeaderPrgress.setVisibility(View.INVISIBLE);
-                mHeadertextView.setText(data == null ? title[6] : data);
+                if (mHeaderPrgress != null) {
+                    mHeaderPrgress.setVisibility(View.INVISIBLE);
+                    mHeadertextView.setText(data == null ? title[6] : data);
+                }
                 break;
             case LOADING:
-                mfootPrgress.setVisibility(View.VISIBLE);
-                mfootertextView.setText(title[5]);
+                if (mfootPrgress != null) {
+                    mfootPrgress.setVisibility(View.VISIBLE);
+                    mfootertextView.setText(title[5]);
+                }
                 break;
             case REFRESHING:
-                mHeaderPrgress.setVisibility(View.VISIBLE);
-                mHeadertextView.setText(title[2]);
+                if (mHeaderPrgress != null) {
+                    mHeaderPrgress.setVisibility(View.VISIBLE);
+                    mHeadertextView.setText(title[2]);
+                }
                 break;
             case LOADINGCOMPLETE:
-                mfootPrgress.setVisibility(View.INVISIBLE);
-                mfootertextView.setText(data == null ? title[7] : data);
+                if (mfootPrgress != null) {
+                    mfootPrgress.setVisibility(View.INVISIBLE);
+                    mfootertextView.setText(data == null ? title[7] : data);
+                }
                 break;
             case IDEL:
                 break;
@@ -88,25 +94,24 @@ public class MyRefreshWrap extends RefreshLayout.BaseRefreshWrap<String> {
         }
 
     }
+
     @Override
     protected void initView(RefreshLayout layout) {
         super.initView(layout);
-        layoutWeakReference=new WeakReference<RefreshLayout>(layout);
+        layoutWeakReference = new WeakReference<RefreshLayout>(layout);
         View header = layout.getmHeader();
         View footer = layout.getmFooter();
-        if(header!=null) {
-            mHeaderimageView = header.findViewById(R.id.imageView);
+        if (header != null) {
             mHeadertextView = header.findViewById(R.id.textView);
             mHeaderPrgress = header.findViewById(R.id.progressBar);
         }
-        if(footer!=null) {
-            mFooterimageView = footer.findViewById(R.id.imageView);
+        if (footer != null) {
             mfootertextView = footer.findViewById(R.id.textView);
             mfootPrgress = footer.findViewById(R.id.progressBar);
         }
-        String[] tempVertical={"下拉刷新", "释放刷新", "正在刷新中", "上拉加载", "释放加载", "正在加载中", "刷新完成", "加载完成"};
-        String[] tempHorizontal={"右拉刷新", "释放刷新", "正在刷新中", "左拉加载", "释放加载", "正在加载中", "刷新完成", "加载完成"};
-        title=(layout.getOrentation()== RefreshLayout.Orentation.VERTICAL)?
-                tempVertical:tempHorizontal;
+        String[] tempVertical = {"下拉刷新", "释放刷新", "正在刷新中", "上拉加载", "释放加载", "正在加载中", "刷新完成", "加载完成"};
+        String[] tempHorizontal = {"右拉刷新", "释放刷新", "正在刷新中", "左拉加载", "释放加载", "正在加载中", "刷新完成", "加载完成"};
+        title = (layout.getOrentation() == RefreshLayout.Orentation.VERTICAL) ?
+                tempVertical : tempHorizontal;
     }
 }
